@@ -11,11 +11,12 @@ static lv_obj_t *meter_temp;
 lv_obj_t *bar;
 void lv_example_bar_3(void);
 static void set_temp(lv_obj_t * bar, int32_t temp);
-
-//#include <Arduino.h>
 static void set_value(lv_meter_indicator_t * indic, int32_t v);
 void lv_example_meter_2(void);
 void lv_example_label_1(void);
+void lv_example_event_1(void);
+static void event_cb(lv_event_t * e);
+
 #define PIN_GATE_IN 2
 #define IRQ_GATE_IN  0
 #define PIN_LED_OUT 13
@@ -36,7 +37,7 @@ int main() {
     int error =0;
     float temp, humidity;
     int i=0;
-
+    lv_example_event_1();
     while (1) {
         i+=1;
         // print the percentage and 16 bit normalized values
@@ -89,7 +90,7 @@ void lv_example_meter_2(void)
     lv_meter_scale_t * scale = lv_meter_add_scale(meter_temp);
     lv_meter_set_scale_ticks(meter_temp, scale, 11, 2, 10, lv_palette_main(LV_PALETTE_GREY));
     lv_meter_set_scale_major_ticks(meter_temp, scale, 1, 2, 30, lv_color_hex3(0xeee), 15);
-    lv_meter_set_scale_range(meter_temp, scale, 0, 100, 270, 90);
+    lv_meter_set_scale_range(meter_temp, scale, 0, 60, 270, 90);
 
     /*Add a three arc indicator*/
     indic1 = lv_meter_add_arc(meter_temp, scale, 10, lv_palette_main(LV_PALETTE_RED), 0);
@@ -147,4 +148,30 @@ void lv_example_bar_3(void)
     lv_anim_set_values(&a, -20, 40);
     lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
     lv_anim_start(&a);
+}
+
+static void event_cb(lv_event_t * e)
+{
+    LV_LOG_USER("Clicked");
+
+    static uint32_t cnt = 1;
+    lv_obj_t * btn = lv_event_get_target(e);
+    lv_obj_t * label = lv_obj_get_child(btn, 0);
+    lv_label_set_text_fmt(label, "%"LV_PRIu32, cnt);
+    cnt++;
+}
+
+/**
+ * Add click event to a button
+ */
+void lv_example_event_1(void)
+{
+    lv_obj_t * btn = lv_btn_create(lv_scr_act());
+    lv_obj_set_size(btn, 100, 50);
+    lv_obj_center(btn);
+    lv_obj_add_event_cb(btn, event_cb, LV_EVENT_CLICKED, NULL);
+
+    lv_obj_t * label = lv_label_create(btn);
+    lv_label_set_text(label, "Click me!");
+    lv_obj_center(label);
 }
