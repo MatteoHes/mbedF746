@@ -66,7 +66,7 @@ int main() {
 
         //Le son doit être échantilloné plus vite que la température et l'humidité
         //On ne les lit donc que toutes les 12 boucles
-        if(i>=12)
+        if(i>=15)
         {
         //Vérification qu'on reçoit bien les données
         error=sensor.readData();
