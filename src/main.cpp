@@ -26,6 +26,7 @@ void lv_example_bar_3(void);
 
 //Declaration des variables globales
 lv_coord_t tabTemp[11],tabHum[11],test1=50,test2=50;
+int stt=1;
 #define PIN_GATE_IN 2
 #define IRQ_GATE_IN  0
 #define PIN_LED_OUT 13
@@ -36,6 +37,7 @@ DHT sensor(D2,DHT22);
 ThreadLvgl threadLvgl(30);
 
 int main() {
+
     //Création des Widgets
     threadLvgl.lock();
     lv_example_meter_2();
@@ -44,6 +46,7 @@ int main() {
     lv_example_event_1();
     lv_example_chart_1();
     threadLvgl.unlock();
+
     //Lecture de la broche A1, l'amplitude du son (envelope)
     AnalogIn ain(A1);
     int ain1=0,ain2=0;
@@ -72,8 +75,9 @@ int main() {
             //Lecture des données de température et humidité
             temp=sensor.ReadTemperature(CELCIUS);
             humidity=sensor.ReadHumidity();
-            printf("\n Temperature (chaude) %.2f \n",temp);
+            printf("\n Temperature %.2f \n",temp);
             printf("Humidity %.2f \n",humidity);
+
             //Remplissage de tableaux pour le graphe
             for(int n=0;n<10;n=n+1)
             {
@@ -87,6 +91,10 @@ int main() {
             threadLvgl.lock();
             set_value(indic1,temp);
             set_value(indic3,humidity);
+            if (stt==1)
+            {
+            lv_example_chart_1();
+            }
             threadLvgl.unlock();
         }
         else
@@ -109,7 +117,6 @@ static void set_value(lv_meter_indicator_t * indic, int32_t v)
 void lv_example_meter_2(void)
 {
     meter_temp = lv_meter_create(lv_scr_act());
-    //lv_obj_center(meter_temp);
     lv_obj_set_pos(meter_temp,50,50);
     lv_obj_set_size(meter_temp, 200, 200);
 
@@ -183,7 +190,7 @@ void lv_example_bar_3(void)
     lv_style_set_bg_opa(&style_indic, LV_OPA_COVER);
     //On peut choisir la couleur de la barre en fonction de sa hauteur
     lv_style_set_bg_color(&style_indic, lv_palette_main(LV_PALETTE_RED));
-    lv_style_set_bg_grad_color(&style_indic, lv_palette_main(LV_PALETTE_BLUE));
+    lv_style_set_bg_grad_color(&style_indic, lv_palette_main(LV_PALETTE_YELLOW));
     lv_style_set_bg_grad_dir(&style_indic, LV_GRAD_DIR_VER);
 
     bar = lv_bar_create(lv_scr_act());
@@ -212,7 +219,14 @@ static void event_cb(lv_event_t * e)
     static uint32_t cnt = 1;
     lv_obj_t * btn = lv_event_get_target(e);
     //On met à jour le graphe
-    lv_example_chart_1();
+    if (stt==1)
+    {
+         stt=0;
+    }
+    else if (stt==0)
+    {
+        stt=1;
+    }
     cnt++;
 }
 
@@ -226,7 +240,7 @@ void lv_example_event_1(void)
     lv_obj_align(btn, LV_ALIGN_CENTER, 350, -100);
 
     lv_obj_t * label = lv_label_create(btn);
-    lv_label_set_text(label, "Refresh");
+    lv_label_set_text(label, "Start/Stop");
     lv_obj_center(label);
 }
 
