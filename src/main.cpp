@@ -1,4 +1,3 @@
-
 #include <mbed.h>
 //Bibliothèque de l'écran d'affichage
 #include <threadLvgl.h>
@@ -7,25 +6,30 @@
 #include <cstdio>
 #include "mbed.h"
 
-//Intialisation des variables globales
+//Declaration des pointeurs
 lv_meter_indicator_t * indic1;
 lv_meter_indicator_t * indic2;
 lv_meter_indicator_t * indic3;
 static lv_obj_t *meter_temp;
 lv_obj_t *bar;
-void lv_example_bar_3(void);
+
+//Initialisation des fonctions
 static void set_temp(lv_obj_t * bar, int32_t temp);
 static void set_value(lv_meter_indicator_t * indic, int32_t v);
+static void event_cb(lv_event_t * e);
+
 void lv_example_meter_2(void);
 void lv_example_label_1(void);
 void lv_example_event_1(void);
 void lv_example_chart_1(void);
-static void event_cb(lv_event_t * e);
-lv_coord_t tabTemp[11]={0,0,0,0,0,0,0,0,0,0,0},tabHum[11],test1=50,test2=50;
+void lv_example_bar_3(void);
+
+//Declaration des variables globales
+lv_coord_t tabTemp[11],tabHum[11],test1=50,test2=50;
 #define PIN_GATE_IN 2
 #define IRQ_GATE_IN  0
 #define PIN_LED_OUT 13
-//#define PIN_ANALOG_IN A10
+
 
 DHT sensor(D2,DHT22);
 
@@ -58,8 +62,8 @@ int main() {
         threadLvgl.unlock();
 
         //Le son doit être échantilloné plus vite que la température et l'humidité
-        //On ne les lit donc que toutes les 30 boucles
-        if(i>=30)
+        //On ne les lit donc que toutes les 12 boucles
+        if(i>=12)
         {
         //Vérification qu'on reçoit bien les données
         error=sensor.readData();
@@ -90,8 +94,8 @@ int main() {
             printf("Error %d\n",error);
         }
         }
-        //20ms de délai permet d'avoir un affichage du son fluide mais pas (trop) épileptique
-        ThisThread::sleep_for(20ms);
+        //50ms de délai permet d'avoir un affichage du son fluide mais pas (trop) épileptique
+        ThisThread::sleep_for(50ms);
     }
 }
 
@@ -241,7 +245,7 @@ void lv_example_chart_1(void)
     lv_chart_series_t * ser1 = lv_chart_add_series(chart, lv_palette_main(LV_PALETTE_RED), LV_CHART_AXIS_PRIMARY_Y);
     lv_chart_series_t * ser2 = lv_chart_add_series(chart, lv_palette_main(LV_PALETTE_BLUE), LV_CHART_AXIS_SECONDARY_Y);
 
-//On affiche les tableaux rempli dans la boucle
+//On affiche les tableaux remplis dans la boucle
     for (int i=0;i<10;i++)
     {
         lv_chart_set_next_value(chart, ser1, tabTemp[i]);
